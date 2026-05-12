@@ -13,7 +13,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🎯 글로벌 퍼블리셔 세일즈 대시보드")
+st.title("🎯 경쟁 퍼블리셔 세일즈 대시보드")
 st.info("경쟁 퍼블리셔의 로우 데이터를 시계열 그래프로 시각화해, 마케팅/세일즈 분석을 지원합니다.")
 
 # 2. 퍼블리셔 선택 (사이드바)
@@ -99,7 +99,7 @@ if df_ccu is not None:
                 
                 fig = px.line(
                     filtered_df, x='Date', y=sorted_active_games,
-                    title=f"[{selected_pub}] {selected_metric} (성과순 정렬)",
+                    title=f"[{selected_pub}] {selected_metric}",
                     labels={"value": "수치", "variable": "게임명"},
                     template="plotly_white",
                     color_discrete_sequence=custom_colors
