@@ -73,38 +73,57 @@ if df_ccu is not None:
     min_date, max_date = df_ccu['Date'].min().date(), df_ccu['Date'].max().date()
     date_range = st.sidebar.date_input("조회 기간", value=(min_date, max_date), min_value=min_date, max_value=max_date)
 
-    # 5. 메인 대시보드 시각화
+# 5. 메인 대시보드 시각화
     if len(selected_games) > 0 and len(date_range) == 2:
         start_date, end_date = date_range
         target_df = metric_map[selected_metric]
         
-        # 날짜 및 게임 필터링 적용
+        # 1. 날짜 필터링 적용
         mask = (target_df['Date'].dt.date >= start_date) & (target_df['Date'].dt.date <= end_date)
         filtered_df = target_df.loc[mask, ['Date'] + selected_games]
 
-        # 탭(Tab) 구성을 사용하여 화면 효율 극대화
-        tab1, tab2 = st.tabs(["📈 지표 변동 추이", "📊 데이터 (Raw)"])
+        # 성과순 정렬 로직
+        game_sums = filtered_df[selected_games].sum()
+        active_games_sums = game_sums[game_sums > 0].sort_values(ascending=False)
+        sorted_active_games = active_games_sums.index.tolist()
 
-        with tab1:
-            # Plotly에 내장된 대형 팔레트 3개를 합쳐서 총 74개의 고유 색상표 생성
-            custom_colors = px.colors.qualitative.Alphabet + px.colors.qualitative.Light24 + px.colors.qualitative.Dark24
-            
-            # 인터랙티브 그래프 (Plotly)
-            fig = px.line(
-                filtered_df, x='Date', y=selected_games,
-                title=f"[{selected_pub}] {selected_metric}",
-                labels={"value": "수치", "variable": "게임명"},
-                template="plotly_white",
-                color_discrete_sequence=custom_colors 
-            )
-            # 마우스 오버 시 모든 수치 표시 및 범례 위치 조정
-            fig.update_layout(hovermode="x unified", legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5))
-            fig.update_traces(connectgaps=True)
-            
-            st.plotly_chart(fig, use_container_width=True)
-            
-        with tab2:
-            st.dataframe(filtered_df, use_container_width=True)
+        if not sorted_active_games:
+            st.warning("⚠️ 선택한 기간 동안 성과(데이터)가 있는 게임이 없습니다.")
+        else:
+            filtered_df = filtered_df[['Date'] + sorted_active_games]
+
+            tab1, tab2 = st.tabs(["📈 지표 변동 추이", "📊 데이터 (Raw)"])
+
+            with tab1:
+                custom_colors = px.colors.qualitative.Alphabet + px.colors.qualitative.Light24 + px.colors.qualitative.Dark24
+                
+                fig = px.line(
+                    filtered_df, x='Date', y=sorted_active_games,
+                    title=f"[{selected_pub}] {selected_metric} (성과순 정렬)",
+                    labels={"value": "수치", "variable": "게임명"},
+                    template="plotly_white",
+                    color_discrete_sequence=custom_colors
+                )
+                
+                fig.update_layout(
+                    hovermode="x unified",
+                    hoverlabel=dict(namelength=-1),
+                    legend=dict(traceorder="normal")
+                )
+                
+                # connectgaps를 False로 주어, 데이터가 없는 구간(출시 전)에 억지로 선을 잇거나 0으로 취급하지 않게 확실히 방어합니다.
+                fig.update_traces(connectgaps=False)
+                
+                st.plotly_chart(fig, use_container_width=True)
+                
+                st.markdown(f"""
+                **✅ 스마트 필터링 적용:** 현재 조회 기간({start_date} ~ {end_date}) 동안 
+                실제 수치가 발생한 **{len(sorted_active_games)}개의 게임**이 누적 성과가 높은 순서대로 정렬되었습니다.
+                *(출시 전이거나 데이터가 없는 날짜에는 해당 게임이 툴팁에 표시되지 않습니다.)*
+                """)
+
+            with tab2:
+                st.dataframe(filtered_df, use_container_width=True)
 
     else:
         st.warning("👈 좌측 사이드바에서 분석할 게임과 기간을 선택해 주세요.")
