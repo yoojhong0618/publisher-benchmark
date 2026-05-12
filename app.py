@@ -13,8 +13,8 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🎯 글로벌 퍼블리셔 세일즈 & 마케팅 분석 대시보드")
-st.info("퍼블리셔별 성과 지표를 일자별로 비교 분석하여 인사이트를 도출합니다.")
+st.title("🎯 글로벌 퍼블리셔 세일즈 대시보드")
+st.info("경쟁 퍼블리셔의 로우 데이터를 시계열 그래프로 시각화해, 마케팅/세일즈 분석을 지원합니다.")
 
 # 2. 퍼블리셔 선택 (사이드바)
 publisher_list = ["Fireshine Games", "Raw Fury (준비 중)"]
@@ -52,7 +52,7 @@ if df_ccu is not None:
 
     # 4. 필터링 영역 (사이드바)
     st.sidebar.divider()
-    st.sidebar.subheader("🔍 데이터 필터")
+    st.sidebar.subheader("🔍 필터")
     
     # 지표 선택
     metric_map = {
@@ -64,7 +64,7 @@ if df_ccu is not None:
     
     # 게임 다중 선택 (기본값: 상위 3개 게임)
     selected_games = st.sidebar.multiselect(
-        "분석 대상 게임 (최대 5개 추천)",
+        "분석 대상 게임",
         options=game_list,
         default=game_list[:3] 
     )
@@ -83,7 +83,7 @@ if df_ccu is not None:
         filtered_df = target_df.loc[mask, ['Date'] + selected_games]
 
         # 탭(Tab) 구성을 사용하여 화면 효율 극대화
-        tab1, tab2 = st.tabs(["📈 시계열 트래픽 분석", "📊 데이터 요약 (Raw)"])
+        tab1, tab2 = st.tabs(["📈 지표 변동 추이", "📊 데이터 (Raw)"])
 
         with tab1:
             # 인터랙티브 그래프 (Plotly)
@@ -94,7 +94,7 @@ if df_ccu is not None:
                 template="plotly_white"
             )
             # 마우스 오버 시 모든 수치 표시 및 범례 위치 조정
-            fig.update_layout(hovermode="x unified", legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
+            fig.update_layout(hovermode="x unified", legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5))
             fig.update_traces(connectgaps=True)
             
             st.plotly_chart(fig, use_container_width=True)
