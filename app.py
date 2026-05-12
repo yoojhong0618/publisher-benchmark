@@ -105,11 +105,10 @@ if df_ccu is not None:
                     color_discrete_sequence=custom_colors
                 )
                 
-                # 상위 8개 게임만 툴팁에 표시하고, 나머지는 숨기기
-                top_8_games = sorted_active_games[:8]  # 숫자 8을 원하시는 대로 변경 가능합니다.
+                top_8_games = sorted_active_games[:8]  # 호버할 때 표시할 개수
                 
                 fig.for_each_trace(
-                    lambda trace: trace.update(hoverinfo='skip') if trace.name not in top_8_games else ()
+                    lambda trace: trace.update(hoverinfo='skip', hovertemplate=None) if trace.name not in top_8_games else ()
                 )
                 
                 fig.update_layout(
