@@ -105,6 +105,13 @@ if df_ccu is not None:
                     color_discrete_sequence=custom_colors
                 )
                 
+                # 상위 8개 게임만 툴팁에 표시하고, 나머지는 숨기기
+                top_8_games = sorted_active_games[:8]  # 숫자 8을 원하시는 대로 변경 가능합니다.
+                
+                fig.for_each_trace(
+                    lambda trace: trace.update(hoverinfo='skip') if trace.name not in top_8_games else ()
+                )
+                
                 fig.update_layout(
                     hovermode="x unified",
                     hoverlabel=dict(namelength=-1),
@@ -115,12 +122,6 @@ if df_ccu is not None:
                 fig.update_traces(connectgaps=False)
                 
                 st.plotly_chart(fig, use_container_width=True)
-                
-                st.markdown(f"""
-                **✅ 스마트 필터링 적용:** 현재 조회 기간({start_date} ~ {end_date}) 동안 
-                실제 수치가 발생한 **{len(sorted_active_games)}개의 게임**이 누적 성과가 높은 순서대로 정렬되었습니다.
-                *(출시 전이거나 데이터가 없는 날짜에는 해당 게임이 툴팁에 표시되지 않습니다.)*
-                """)
 
             with tab2:
                 st.dataframe(filtered_df, use_container_width=True)
