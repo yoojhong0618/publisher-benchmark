@@ -11,7 +11,7 @@ st.markdown("""
     .main { background-color: #f5f7f9; }
     .stButton>button { width: 100%; border-radius: 5px; height: 3em; background-color: #ff4b4b; color: white; }
     </style>
-    """, unsafe_allow_view_this_style=True)
+    """, unsafe_allow_html=True)
 
 st.title("🎯 글로벌 퍼블리셔 세일즈 & 마케팅 분석 대시보드")
 st.info("퍼블리셔별 성과 지표를 일자별로 비교 분석하여 인사이트를 도출합니다.")
