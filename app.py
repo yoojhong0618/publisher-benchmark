@@ -86,12 +86,16 @@ if df_ccu is not None:
         tab1, tab2 = st.tabs(["📈 지표 변동 추이", "📊 데이터 (Raw)"])
 
         with tab1:
+            # Plotly에 내장된 대형 팔레트 3개를 합쳐서 총 74개의 고유 색상표 생성
+            custom_colors = px.colors.qualitative.Alphabet + px.colors.qualitative.Light24 + px.colors.qualitative.Dark24
+            
             # 인터랙티브 그래프 (Plotly)
             fig = px.line(
                 filtered_df, x='Date', y=selected_games,
                 title=f"[{selected_pub}] {selected_metric}",
                 labels={"value": "수치", "variable": "게임명"},
-                template="plotly_white"
+                template="plotly_white",
+                color_discrete_sequence=custom_colors 
             )
             # 마우스 오버 시 모든 수치 표시 및 범례 위치 조정
             fig.update_layout(hovermode="x unified", legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5))
